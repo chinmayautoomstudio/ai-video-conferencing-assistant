@@ -41,10 +41,12 @@ export default defineConfig({
   },
   define: {
     global: 'globalThis', // Polyfill for Supabase and other libs expecting Node.js global
-    process: {}, // Polyfill for process object
+    process: 'globalThis.process', // Polyfill for process object
     'process.env': '{}',
     'process.nextTick': 'setTimeout',
-    'process.browser': 'true'
+    'process.browser': 'true',
+    'process.platform': '"browser"',
+    'process.version': '"v16.0.0"'
   },
   optimizeDeps: {
     include: ['@supabase/supabase-js'],
