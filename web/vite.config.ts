@@ -40,7 +40,8 @@ export default defineConfig({
     },
   },
   define: {
-    global: 'globalThis',
+    global: 'globalThis', // Polyfill for Supabase and other libs expecting Node.js global
+    process: {}, // Polyfill for process object
     'process.env': '{}',
     'process.nextTick': 'setTimeout',
     'process.browser': 'true'

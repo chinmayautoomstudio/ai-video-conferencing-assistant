@@ -1,11 +1,11 @@
 // Enhanced polyfills for browser compatibility with Supabase
 
-// Global polyfill
+// Global polyfill - ensure global is available for Supabase
 if (typeof global === 'undefined') {
   (window as any).global = globalThis;
 }
 
-// Process polyfill
+// Process polyfill - ensure process object is available
 if (typeof process === 'undefined') {
   (window as any).process = {
     env: {},
