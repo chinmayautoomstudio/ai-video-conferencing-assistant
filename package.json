@@ -1,0 +1,21 @@
+{
+  "name": "ai-video-conference-assistant",
+  "version": "1.0.0",
+  "description": "Cross-platform video conferencing application with AI assistance",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:web\" \"npm run dev:mobile\"",
+    "dev:web": "cd web && npm run dev",
+    "dev:mobile": "cd mobile && npm run start",
+    "build": "npm run build:web && npm run build:mobile",
+    "build:web": "cd web && npm run build",
+    "build:mobile": "cd mobile && npm run build",
+    "install:all": "npm install && cd web && npm install && cd ../mobile && npm install"
+  },
+  "keywords": ["video-conferencing", "webrtc", "react", "react-native"],
+  "author": "AI Assistant",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
