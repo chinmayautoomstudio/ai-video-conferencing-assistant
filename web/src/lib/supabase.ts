@@ -3,7 +3,7 @@
 console.log('🔧 [PRE-IMPORT] Creating d.global object...');
 
 // Create a comprehensive global object
-const createGlobalObject = () => {
+const createPreImportGlobalObject = () => {
   return {
     headers: {},
     process: {},
@@ -19,19 +19,19 @@ const createGlobalObject = () => {
 
 // Apply to globalThis
 if (typeof globalThis !== 'undefined') {
-  (globalThis as any).d = { global: createGlobalObject() };
+  (globalThis as any).d = { global: createPreImportGlobalObject() };
   console.log('🔧 [PRE-IMPORT] d.global created on globalThis:', typeof (globalThis as any).d?.global !== 'undefined');
 }
 
 // Apply to window
 if (typeof window !== 'undefined') {
-  (window as any).d = { global: createGlobalObject() };
+  (window as any).d = { global: createPreImportGlobalObject() };
   console.log('🔧 [PRE-IMPORT] d.global created on window:', typeof (window as any).d?.global !== 'undefined');
 }
 
 // Apply to self
 if (typeof self !== 'undefined') {
-  (self as any).d = { global: createGlobalObject() };
+  (self as any).d = { global: createPreImportGlobalObject() };
   console.log('🔧 [PRE-IMPORT] d.global created on self:', typeof (self as any).d?.global !== 'undefined');
 }
 
