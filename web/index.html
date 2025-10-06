@@ -24,6 +24,18 @@
         }
       }
       
+      // Additional global polyfills for Supabase internal dependencies
+      if (typeof window !== 'undefined') {
+        // Ensure global is available on window
+        window.global = window.global || globalThis;
+        // Add to any object that might be referenced as 'd'
+        if (typeof window.d === 'undefined') {
+          window.d = { global: globalThis };
+        } else {
+          window.d.global = globalThis;
+        }
+      }
+      
       // Process polyfill - comprehensive
       if (typeof process === 'undefined') {
         console.log('🔧 [HTML POLYFILLS] Adding process polyfill');
@@ -147,10 +159,39 @@
         globalThis.clearImmediate = clearTimeout;
       }
       
+      // Create a comprehensive global object for Supabase
+      const createGlobalObject = () => {
+        const globalObj = {
+          global: globalThis,
+          process: window.process || {},
+          Buffer: window.Buffer || {},
+          setImmediate: window.setImmediate || function(fn) { return setTimeout(fn, 0); },
+          clearImmediate: window.clearImmediate || clearTimeout,
+          headers: {}, // Add headers object that Supabase might be looking for
+          fetch: window.fetch,
+          XMLHttpRequest: window.XMLHttpRequest,
+          WebSocket: window.WebSocket
+        };
+        
+        // Make it available globally
+        window.globalObject = globalObj;
+        globalThis.globalObject = globalObj;
+        
+        // Also create 'd' object that Supabase might be referencing
+        window.d = globalObj;
+        globalThis.d = globalObj;
+        
+        return globalObj;
+      };
+      
+      createGlobalObject();
+      
       console.log('🔧 [HTML POLYFILLS] Critical polyfills loaded successfully');
       console.log('🔧 [HTML POLYFILLS] Global available:', typeof global !== 'undefined');
       console.log('🔧 [HTML POLYFILLS] Process available:', typeof process !== 'undefined');
       console.log('🔧 [HTML POLYFILLS] Buffer available:', typeof Buffer !== 'undefined');
+      console.log('🔧 [HTML POLYFILLS] Global object created:', typeof window.globalObject !== 'undefined');
+      console.log('🔧 [HTML POLYFILLS] D object created:', typeof window.d !== 'undefined');
     </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>

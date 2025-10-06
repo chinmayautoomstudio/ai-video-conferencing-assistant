@@ -32,6 +32,15 @@ export default defineConfig({
   define: {
     global: 'globalThis', // Essential polyfill
     'process.env': {}, // Allow Vite to inject env vars
+    'process.browser': 'true',
+    'process.platform': '"browser"',
+    'process.version': '"v16.0.0"',
+    'process.nextTick': 'setTimeout',
+    'Buffer.isBuffer': '() => false',
+    'Buffer.from': '() => new Uint8Array()',
+    'Buffer.alloc': '() => new Uint8Array()',
+    'setImmediate': 'setTimeout',
+    'clearImmediate': 'clearTimeout'
   },
   optimizeDeps: {
     include: ['@supabase/supabase-js'],
