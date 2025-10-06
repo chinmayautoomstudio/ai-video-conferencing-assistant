@@ -1,22 +1,11 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
-import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import path from 'path';
 
 export default defineConfig({
   plugins: [
     react(),
-    nodePolyfills({
-      // Enable polyfills for specific modules
-      include: ['process', 'buffer', 'util'],
-      // Globals polyfills
-      globals: {
-        Buffer: true,
-        global: true,
-        process: true,
-      },
-    }),
     // Custom plugin to fix Supabase d.global issue
     {
       name: 'supabase-d-global-fix',
