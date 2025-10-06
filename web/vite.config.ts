@@ -40,7 +40,12 @@ export default defineConfig({
     'Buffer.from': '() => new Uint8Array()',
     'Buffer.alloc': '() => new Uint8Array()',
     'setImmediate': 'setTimeout',
-    'clearImmediate': 'clearTimeout'
+    'clearImmediate': 'clearTimeout',
+    // CRITICAL: Fix for Supabase d.global issue
+    'd.global': 'globalThis',
+    'd.global.headers': '{}',
+    'd.global.process': '{}',
+    'd.global.Buffer': '{}'
   },
   optimizeDeps: {
     include: ['@supabase/supabase-js'],
