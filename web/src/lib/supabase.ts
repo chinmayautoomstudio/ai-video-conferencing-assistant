@@ -252,11 +252,30 @@ console.log('🔧 [FINAL CHECK] d.global.headers exists:', typeof (globalThis as
 // Force create d.global if it doesn't exist
 if (typeof (globalThis as any).d?.global === 'undefined') {
   console.log('🔧 [FINAL CHECK] Force creating d.global...');
-  (globalThis as any).d = { global: createGlobalObject() };
+  
+  // Create the global object directly
+  const forceGlobalObject = {
+    headers: {},
+    process: {},
+    Buffer: {},
+    fetch: typeof fetch !== 'undefined' ? fetch : undefined,
+    XMLHttpRequest: typeof XMLHttpRequest !== 'undefined' ? XMLHttpRequest : undefined,
+    WebSocket: typeof WebSocket !== 'undefined' ? WebSocket : undefined,
+    global: globalThis,
+    setImmediate: function(fn: Function) { return setTimeout(fn, 0); },
+    clearImmediate: clearTimeout
+  };
+  
+  (globalThis as any).d = { global: forceGlobalObject };
   if (typeof window !== 'undefined') {
-    (window as any).d = { global: createGlobalObject() };
+    (window as any).d = { global: forceGlobalObject };
   }
+  if (typeof self !== 'undefined') {
+    (self as any).d = { global: forceGlobalObject };
+  }
+  
   console.log('🔧 [FINAL CHECK] d.global force created:', typeof (globalThis as any).d?.global !== 'undefined');
+  console.log('🔧 [FINAL CHECK] d.global.headers exists:', typeof (globalThis as any).d?.global?.headers !== 'undefined');
 }
 
 // Create Supabase client
