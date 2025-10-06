@@ -1,35 +1,38 @@
 // CRITICAL: Create d.global object IMMEDIATELY before any imports
 // This must happen before Supabase tries to access d.global
+console.log('🔧 [PRE-IMPORT] Creating d.global object...');
+
+// Create a comprehensive global object
+const createGlobalObject = () => {
+  return {
+    headers: {},
+    process: {},
+    Buffer: {},
+    fetch: typeof fetch !== 'undefined' ? fetch : undefined,
+    XMLHttpRequest: typeof XMLHttpRequest !== 'undefined' ? XMLHttpRequest : undefined,
+    WebSocket: typeof WebSocket !== 'undefined' ? WebSocket : undefined,
+    global: globalThis,
+    setImmediate: function(fn: Function) { return setTimeout(fn, 0); },
+    clearImmediate: clearTimeout
+  };
+};
+
+// Apply to globalThis
 if (typeof globalThis !== 'undefined') {
-  if (!(globalThis as any).d) {
-    (globalThis as any).d = {};
-  }
-  if (!(globalThis as any).d.global) {
-    (globalThis as any).d.global = {
-      headers: {},
-      process: {},
-      Buffer: {},
-      fetch: typeof fetch !== 'undefined' ? fetch : undefined,
-      XMLHttpRequest: typeof XMLHttpRequest !== 'undefined' ? XMLHttpRequest : undefined,
-      WebSocket: typeof WebSocket !== 'undefined' ? WebSocket : undefined
-    };
-  }
+  (globalThis as any).d = { global: createGlobalObject() };
+  console.log('🔧 [PRE-IMPORT] d.global created on globalThis:', typeof (globalThis as any).d?.global !== 'undefined');
 }
 
+// Apply to window
 if (typeof window !== 'undefined') {
-  if (!(window as any).d) {
-    (window as any).d = {};
-  }
-  if (!(window as any).d.global) {
-    (window as any).d.global = {
-      headers: {},
-      process: {},
-      Buffer: {},
-      fetch: typeof fetch !== 'undefined' ? fetch : undefined,
-      XMLHttpRequest: typeof XMLHttpRequest !== 'undefined' ? XMLHttpRequest : undefined,
-      WebSocket: typeof WebSocket !== 'undefined' ? WebSocket : undefined
-    };
-  }
+  (window as any).d = { global: createGlobalObject() };
+  console.log('🔧 [PRE-IMPORT] d.global created on window:', typeof (window as any).d?.global !== 'undefined');
+}
+
+// Apply to self
+if (typeof self !== 'undefined') {
+  (self as any).d = { global: createGlobalObject() };
+  console.log('🔧 [PRE-IMPORT] d.global created on self:', typeof (self as any).d?.global !== 'undefined');
 }
 
 import { createClient } from '@supabase/supabase-js';
@@ -239,6 +242,22 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 console.log('✅ Polyfills verified - global is available');
+
+// FINAL VERIFICATION: Ensure d.global is accessible before creating Supabase client
+console.log('🔧 [FINAL CHECK] Verifying d.global before Supabase client creation...');
+console.log('🔧 [FINAL CHECK] globalThis.d.global exists:', typeof (globalThis as any).d?.global !== 'undefined');
+console.log('🔧 [FINAL CHECK] window.d.global exists:', typeof (window as any).d?.global !== 'undefined');
+console.log('🔧 [FINAL CHECK] d.global.headers exists:', typeof (globalThis as any).d?.global?.headers !== 'undefined');
+
+// Force create d.global if it doesn't exist
+if (typeof (globalThis as any).d?.global === 'undefined') {
+  console.log('🔧 [FINAL CHECK] Force creating d.global...');
+  (globalThis as any).d = { global: createGlobalObject() };
+  if (typeof window !== 'undefined') {
+    (window as any).d = { global: createGlobalObject() };
+  }
+  console.log('🔧 [FINAL CHECK] d.global force created:', typeof (globalThis as any).d?.global !== 'undefined');
+}
 
 // Create Supabase client
 let supabase: any = null;
