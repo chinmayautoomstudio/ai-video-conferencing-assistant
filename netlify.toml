@@ -3,7 +3,9 @@
   publish = "web/dist"
 
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "18.20.8" # Specify exact version for consistency
+  VITE_SUPABASE_URL = "https://jkonlgbqvqxrazwsptxo.supabase.co" # Optional, set in dashboard instead
+  VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imprb25sZ2JxdnF4cmF6d3NwdHhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0OTc1MTIsImV4cCI6MjA3NTA3MzUxMn0.rh-bP1FNvhOqIZawoB-r9rBKXTrBi9pjYbWif_qZqnc" # Optional, set in dashboard instead
 
 [[redirects]]
   from = "/*"
@@ -21,9 +23,4 @@
 [[headers]]
   for = "/sw.js"
   [headers.values]
-    Cache-Control = "public, max-age=0, must-revalidate"
-
-[[headers]]
-  for = "/manifest.json"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000"
+    Cache-Control = "public, max-age=0, must-revalidate" # Keep for now, adjust for production
