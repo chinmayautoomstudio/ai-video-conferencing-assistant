@@ -25,15 +25,25 @@ console.log('🔧 [DEBUG] Creating Supabase client with Key (first 20 chars):', 
 // Ensure all required globals are available for Supabase
 if (typeof global === 'undefined') {
   (window as any).global = globalThis
+  ;(globalThis as any).global = globalThis
 }
 
 if (typeof process === 'undefined') {
-  (window as any).process = {
+  const processPolyfill = {
     env: {},
     browser: true,
     nextTick: (fn: Function) => setTimeout(fn, 0),
-    version: 'v16.0.0'
+    version: 'v16.0.0',
+    platform: 'browser'
   }
+  ;(window as any).process = processPolyfill
+  ;(globalThis as any).process = processPolyfill
+}
+
+// Additional polyfills for production
+if (typeof Buffer === 'undefined') {
+  (window as any).Buffer = { isBuffer: () => false }
+  ;(globalThis as any).Buffer = { isBuffer: () => false }
 }
 
 try {
