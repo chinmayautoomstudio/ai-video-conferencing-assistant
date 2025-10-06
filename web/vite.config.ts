@@ -6,33 +6,6 @@ import path from 'path';
 export default defineConfig({
   plugins: [
     react(),
-    // Custom plugin to fix Supabase d.global issue using transform
-    {
-      name: 'supabase-d-global-fix',
-      transform(code, id) {
-        // Transform the code to replace d.global references
-        if (id.includes('supabase') || code.includes('d.global')) {
-          return `
-            // Fix for Supabase d.global issue
-            if (typeof globalThis !== 'undefined') {
-              if (!globalThis.d) globalThis.d = {};
-              if (!globalThis.d.global) {
-                globalThis.d.global = {
-                  headers: {},
-                  process: globalThis.process || {},
-                  Buffer: globalThis.Buffer || {},
-                  fetch: globalThis.fetch,
-                  XMLHttpRequest: globalThis.XMLHttpRequest,
-                  WebSocket: globalThis.WebSocket
-                };
-              }
-            }
-            ${code}
-          `;
-        }
-        return code;
-      }
-    },
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
