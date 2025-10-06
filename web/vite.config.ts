@@ -30,11 +30,11 @@ export default defineConfig({
     alias: { '@': path.resolve(__dirname, './src') },
   },
   define: {
-    global: 'globalThis', // Essential for Supabase
+    global: 'globalThis', // Essential polyfill
     'process.env': {}, // Allow Vite to inject env vars
   },
   optimizeDeps: {
-    include: ['@supabase/supabase-js'], // Ensure Supabase is optimized
+    include: ['@supabase/supabase-js'],
   },
   server: {
     host: true,
