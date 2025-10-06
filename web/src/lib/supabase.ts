@@ -1,3 +1,41 @@
+// CRITICAL: Create d.global object BEFORE any imports
+console.log('🔧 [PRE-IMPORT] Creating d.global object...');
+
+// Create d.global object immediately
+if (typeof globalThis !== 'undefined') {
+  if (!globalThis.d) {
+    globalThis.d = {};
+  }
+  if (!globalThis.d.global) {
+    globalThis.d.global = {
+      headers: {},
+      process: {},
+      Buffer: {},
+      fetch: typeof fetch !== 'undefined' ? fetch : undefined,
+      XMLHttpRequest: typeof XMLHttpRequest !== 'undefined' ? XMLHttpRequest : undefined,
+      WebSocket: typeof WebSocket !== 'undefined' ? WebSocket : undefined
+    };
+  }
+}
+
+if (typeof window !== 'undefined') {
+  if (!window.d) {
+    window.d = {};
+  }
+  if (!window.d.global) {
+    window.d.global = {
+      headers: {},
+      process: {},
+      Buffer: {},
+      fetch: typeof fetch !== 'undefined' ? fetch : undefined,
+      XMLHttpRequest: typeof XMLHttpRequest !== 'undefined' ? XMLHttpRequest : undefined,
+      WebSocket: typeof WebSocket !== 'undefined' ? WebSocket : undefined
+    };
+  }
+}
+
+console.log('🔧 [PRE-IMPORT] d.global created:', typeof globalThis.d?.global !== 'undefined');
+
 import { createClient } from '@supabase/supabase-js';
 
 console.log('🔧 [SUPABASE] Initializing Supabase client...');
@@ -13,20 +51,14 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase configuration');
 }
 
-// Create Supabase client
+// Create Supabase client with minimal configuration
 let supabase: any = null;
 
 try {
-  supabase = createClient(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-      detectSessionInUrl: false,
-      flowType: 'implicit',
-    },
-  });
+  supabase = createClient(supabaseUrl, supabaseAnonKey);
   console.log('✅ Supabase client created successfully');
 
+  // Test the client
   supabase
     .from('meetings')
     .select('count')

@@ -6,34 +6,31 @@ import path from 'path';
 export default defineConfig({
   plugins: [
     react(),
-    // Custom plugin to fix Supabase d.global issue
+    // Custom plugin to fix Supabase d.global issue using transform
     {
       name: 'supabase-d-global-fix',
-      generateBundle(options, bundle) {
-        // Find the main bundle
-        for (const fileName in bundle) {
-          const chunk = bundle[fileName];
-          if (chunk.type === 'chunk' && chunk.isEntry) {
-            // Add d.global polyfill at the beginning of the bundle
-            chunk.code = `
-              // Fix for Supabase d.global issue
-              if (typeof globalThis !== 'undefined') {
-                if (!globalThis.d) globalThis.d = {};
-                if (!globalThis.d.global) {
-                  globalThis.d.global = {
-                    headers: {},
-                    process: globalThis.process || {},
-                    Buffer: globalThis.Buffer || {},
-                    fetch: globalThis.fetch,
-                    XMLHttpRequest: globalThis.XMLHttpRequest,
-                    WebSocket: globalThis.WebSocket
-                  };
-                }
+      transform(code, id) {
+        // Transform the code to replace d.global references
+        if (id.includes('supabase') || code.includes('d.global')) {
+          return `
+            // Fix for Supabase d.global issue
+            if (typeof globalThis !== 'undefined') {
+              if (!globalThis.d) globalThis.d = {};
+              if (!globalThis.d.global) {
+                globalThis.d.global = {
+                  headers: {},
+                  process: globalThis.process || {},
+                  Buffer: globalThis.Buffer || {},
+                  fetch: globalThis.fetch,
+                  XMLHttpRequest: globalThis.XMLHttpRequest,
+                  WebSocket: globalThis.WebSocket
+                };
               }
-              ${chunk.code}
-            `;
-          }
+            }
+            ${code}
+          `;
         }
+        return code;
       }
     },
     VitePWA({
