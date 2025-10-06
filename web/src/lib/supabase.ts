@@ -1,3 +1,37 @@
+// CRITICAL: Create d.global object IMMEDIATELY before any imports
+// This must happen before Supabase tries to access d.global
+if (typeof globalThis !== 'undefined') {
+  if (!(globalThis as any).d) {
+    (globalThis as any).d = {};
+  }
+  if (!(globalThis as any).d.global) {
+    (globalThis as any).d.global = {
+      headers: {},
+      process: {},
+      Buffer: {},
+      fetch: typeof fetch !== 'undefined' ? fetch : undefined,
+      XMLHttpRequest: typeof XMLHttpRequest !== 'undefined' ? XMLHttpRequest : undefined,
+      WebSocket: typeof WebSocket !== 'undefined' ? WebSocket : undefined
+    };
+  }
+}
+
+if (typeof window !== 'undefined') {
+  if (!(window as any).d) {
+    (window as any).d = {};
+  }
+  if (!(window as any).d.global) {
+    (window as any).d.global = {
+      headers: {},
+      process: {},
+      Buffer: {},
+      fetch: typeof fetch !== 'undefined' ? fetch : undefined,
+      XMLHttpRequest: typeof XMLHttpRequest !== 'undefined' ? XMLHttpRequest : undefined,
+      WebSocket: typeof WebSocket !== 'undefined' ? WebSocket : undefined
+    };
+  }
+}
+
 import { createClient } from '@supabase/supabase-js';
 
 // CRITICAL: Apply polyfills immediately before any Supabase operations
@@ -162,16 +196,29 @@ const createGlobalObject = () => {
     (window as any).globalObject = globalObj;
   }
   
-  // Also create 'd' object that Supabase might be referencing
-  (globalThis as any).d = globalObj;
+  // CRITICAL: Create 'd' object with 'global' property that Supabase is looking for
+  const dObject = {
+    global: globalObj,
+    headers: {},
+    process: (globalThis as any).process || {},
+    Buffer: (globalThis as any).Buffer || {}
+  };
+  
+  (globalThis as any).d = dObject;
   if (typeof window !== 'undefined') {
-    (window as any).d = globalObj;
+    (window as any).d = dObject;
   }
   
   return globalObj;
 };
 
 createGlobalObject();
+
+// CRITICAL: Ensure d.global is available immediately
+console.log('🔧 [SUPABASE POLYFILLS] Verifying d.global availability...');
+console.log('🔧 [SUPABASE POLYFILLS] d object exists:', typeof (globalThis as any).d !== 'undefined');
+console.log('🔧 [SUPABASE POLYFILLS] d.global exists:', typeof (globalThis as any).d?.global !== 'undefined');
+console.log('🔧 [SUPABASE POLYFILLS] d.global.headers exists:', typeof (globalThis as any).d?.global?.headers !== 'undefined');
 
 console.log('🔧 [SUPABASE POLYFILLS] Polyfills applied successfully');
 console.log('🔧 [SUPABASE POLYFILLS] Global available:', typeof global !== 'undefined');
