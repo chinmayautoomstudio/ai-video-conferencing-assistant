@@ -1,11 +1,52 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import path from 'path';
 
 export default defineConfig({
   plugins: [
     react(),
+    nodePolyfills({
+      // Enable polyfills for specific modules
+      include: ['process', 'buffer', 'util'],
+      // Globals polyfills
+      globals: {
+        Buffer: true,
+        global: true,
+        process: true,
+      },
+    }),
+    // Custom plugin to fix Supabase d.global issue
+    {
+      name: 'supabase-d-global-fix',
+      generateBundle(options, bundle) {
+        // Find the main bundle
+        for (const fileName in bundle) {
+          const chunk = bundle[fileName];
+          if (chunk.type === 'chunk' && chunk.isEntry) {
+            // Add d.global polyfill at the beginning of the bundle
+            chunk.code = `
+              // Fix for Supabase d.global issue
+              if (typeof globalThis !== 'undefined') {
+                if (!globalThis.d) globalThis.d = {};
+                if (!globalThis.d.global) {
+                  globalThis.d.global = {
+                    headers: {},
+                    process: globalThis.process || {},
+                    Buffer: globalThis.Buffer || {},
+                    fetch: globalThis.fetch,
+                    XMLHttpRequest: globalThis.XMLHttpRequest,
+                    WebSocket: globalThis.WebSocket
+                  };
+                }
+              }
+              ${chunk.code}
+            `;
+          }
+        }
+      }
+    },
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
