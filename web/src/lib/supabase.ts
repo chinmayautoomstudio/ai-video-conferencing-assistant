@@ -1,40 +1,60 @@
-// CRITICAL: Create d.global object BEFORE any imports
-console.log('🔧 [PRE-IMPORT] Creating d.global object...');
+// CRITICAL: Create comprehensive global polyfills BEFORE any imports
+console.log('🔧 [PRE-IMPORT] Creating comprehensive global polyfills...');
 
-// Create d.global object immediately
-if (typeof globalThis !== 'undefined') {
-  if (!(globalThis as any).d) {
-    (globalThis as any).d = {};
-  }
-  if (!(globalThis as any).d.global) {
-    (globalThis as any).d.global = {
-      headers: {},
-      process: {},
-      Buffer: {},
-      fetch: typeof fetch !== 'undefined' ? fetch : undefined,
-      XMLHttpRequest: typeof XMLHttpRequest !== 'undefined' ? XMLHttpRequest : undefined,
-      WebSocket: typeof WebSocket !== 'undefined' ? WebSocket : undefined
-    };
-  }
-}
+// Create comprehensive global object
+const createGlobalPolyfills = () => {
+  const globalObj = {
+    headers: {},
+    process: {},
+    Buffer: {},
+    fetch: typeof fetch !== 'undefined' ? fetch : undefined,
+    XMLHttpRequest: typeof XMLHttpRequest !== 'undefined' ? XMLHttpRequest : undefined,
+    WebSocket: typeof WebSocket !== 'undefined' ? WebSocket : undefined,
+    global: globalThis,
+    setImmediate: function(fn: Function) { return setTimeout(fn, 0); },
+    clearImmediate: clearTimeout
+  };
 
-if (typeof window !== 'undefined') {
-  if (!(window as any).d) {
-    (window as any).d = {};
+  // Apply to globalThis
+  if (typeof globalThis !== 'undefined') {
+    (globalThis as any).d = { global: globalObj };
+    (globalThis as any).global = globalThis;
+    (globalThis as any).process = globalObj.process;
+    (globalThis as any).Buffer = globalObj.Buffer;
+    (globalThis as any).setImmediate = globalObj.setImmediate;
+    (globalThis as any).clearImmediate = globalObj.clearImmediate;
   }
-  if (!(window as any).d.global) {
-    (window as any).d.global = {
-      headers: {},
-      process: {},
-      Buffer: {},
-      fetch: typeof fetch !== 'undefined' ? fetch : undefined,
-      XMLHttpRequest: typeof XMLHttpRequest !== 'undefined' ? XMLHttpRequest : undefined,
-      WebSocket: typeof WebSocket !== 'undefined' ? WebSocket : undefined
-    };
-  }
-}
 
-console.log('🔧 [PRE-IMPORT] d.global created:', typeof (globalThis as any).d?.global !== 'undefined');
+  // Apply to window
+  if (typeof window !== 'undefined') {
+    (window as any).d = { global: globalObj };
+    (window as any).global = globalThis;
+    (window as any).process = globalObj.process;
+    (window as any).Buffer = globalObj.Buffer;
+    (window as any).setImmediate = globalObj.setImmediate;
+    (window as any).clearImmediate = globalObj.clearImmediate;
+  }
+
+  // Apply to self
+  if (typeof self !== 'undefined') {
+    (self as any).d = { global: globalObj };
+    (self as any).global = globalThis;
+    (self as any).process = globalObj.process;
+    (self as any).Buffer = globalObj.Buffer;
+    (self as any).setImmediate = globalObj.setImmediate;
+    (self as any).clearImmediate = globalObj.clearImmediate;
+  }
+
+  return globalObj;
+};
+
+createGlobalPolyfills();
+
+console.log('🔧 [PRE-IMPORT] Comprehensive polyfills created');
+console.log('🔧 [PRE-IMPORT] d.global exists:', typeof (globalThis as any).d?.global !== 'undefined');
+console.log('🔧 [PRE-IMPORT] global exists:', typeof (globalThis as any).global !== 'undefined');
+console.log('🔧 [PRE-IMPORT] process exists:', typeof (globalThis as any).process !== 'undefined');
+console.log('🔧 [PRE-IMPORT] Buffer exists:', typeof (globalThis as any).Buffer !== 'undefined');
 
 import { createClient } from '@supabase/supabase-js';
 
@@ -51,11 +71,29 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase configuration');
 }
 
-// Create Supabase client with minimal configuration
+// Create Supabase client with specific configuration to avoid d.global issues
 let supabase: any = null;
 
 try {
-  supabase = createClient(supabaseUrl, supabaseAnonKey);
+  supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+      detectSessionInUrl: false,
+      flowType: 'implicit',
+    },
+    global: {
+      headers: {},
+    },
+    db: {
+      schema: 'public',
+    },
+    realtime: {
+      params: {
+        eventsPerSecond: 10,
+      },
+    },
+  });
   console.log('✅ Supabase client created successfully');
 
   // Test the client
