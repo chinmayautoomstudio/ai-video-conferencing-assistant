@@ -22,29 +22,19 @@ let supabase: any = null
 console.log('🔧 [DEBUG] Creating Supabase client with URL:', supabaseUrl)
 console.log('🔧 [DEBUG] Creating Supabase client with Key (first 20 chars):', supabaseAnonKey.substring(0, 20) + '...')
 
-// Ensure all required globals are available for Supabase
+// Polyfills are loaded in main.tsx before this file is imported
+// Verify polyfills are available
 if (typeof global === 'undefined') {
-  (window as any).global = globalThis
-  ;(globalThis as any).global = globalThis
+  console.error('❌ Global polyfill not loaded! Check polyfills.ts')
+  throw new Error('Global polyfill not available')
 }
 
 if (typeof process === 'undefined') {
-  const processPolyfill = {
-    env: {},
-    browser: true,
-    nextTick: (fn: Function) => setTimeout(fn, 0),
-    version: 'v16.0.0',
-    platform: 'browser'
-  }
-  ;(window as any).process = processPolyfill
-  ;(globalThis as any).process = processPolyfill
+  console.error('❌ Process polyfill not loaded! Check polyfills.ts')
+  throw new Error('Process polyfill not available')
 }
 
-// Additional polyfills for production
-if (typeof Buffer === 'undefined') {
-  (window as any).Buffer = { isBuffer: () => false }
-  ;(globalThis as any).Buffer = { isBuffer: () => false }
-}
+console.log('✅ Polyfills verified - global and process are available')
 
 try {
   // Create client with proper configuration
