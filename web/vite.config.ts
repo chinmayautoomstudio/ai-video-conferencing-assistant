@@ -20,32 +20,21 @@ export default defineConfig({
         scope: '/',
         start_url: '/',
         icons: [
-          {
-            src: 'vite.svg',
-            sizes: 'any',
-            type: 'image/svg+xml',
-          },
-          {
-            src: 'icon.svg',
-            sizes: '192x192',
-            type: 'image/svg+xml',
-          },
+          { src: 'vite.svg', sizes: 'any', type: 'image/svg+xml' },
+          { src: 'icon.svg', sizes: '192x192', type: 'image/svg+xml' },
         ],
       },
     }),
   ],
   resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
+    alias: { '@': path.resolve(__dirname, './src') },
   },
   define: {
-    global: 'globalThis', // Essential polyfill for Supabase
-    'process.env': {}, // Minimal polyfill for process.env (let Vite handle env vars)
+    global: 'globalThis', // Essential for Supabase
+    'process.env': {}, // Allow Vite to inject env vars
   },
   optimizeDeps: {
     include: ['@supabase/supabase-js'], // Ensure Supabase is optimized
-    exclude: ['simple-peer'], // Exclude if it causes issues
   },
   server: {
     host: true,
