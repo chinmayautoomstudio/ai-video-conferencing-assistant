@@ -253,7 +253,7 @@ console.log('🔧 [FINAL CHECK] d.global.headers exists:', typeof (globalThis as
 if (typeof (globalThis as any).d?.global === 'undefined') {
   console.log('🔧 [FINAL CHECK] Force creating d.global...');
   
-  // Create the global object directly
+  // Create the global object directly - SIMPLIFIED APPROACH
   const forceGlobalObject = {
     headers: {},
     process: {},
@@ -266,16 +266,48 @@ if (typeof (globalThis as any).d?.global === 'undefined') {
     clearImmediate: clearTimeout
   };
   
-  (globalThis as any).d = { global: forceGlobalObject };
-  if (typeof window !== 'undefined') {
-    (window as any).d = { global: forceGlobalObject };
+  // Try multiple approaches to create d.global
+  try {
+    // Approach 1: Direct assignment
+    (globalThis as any).d = { global: forceGlobalObject };
+    console.log('🔧 [FINAL CHECK] Approach 1 - Direct assignment:', typeof (globalThis as any).d?.global !== 'undefined');
+    
+    // Approach 2: Create d first, then add global
+    if (typeof (globalThis as any).d === 'undefined') {
+      (globalThis as any).d = {};
+    }
+    (globalThis as any).d.global = forceGlobalObject;
+    console.log('🔧 [FINAL CHECK] Approach 2 - Create d first:', typeof (globalThis as any).d?.global !== 'undefined');
+    
+    // Approach 3: Use Object.defineProperty
+    if (typeof (globalThis as any).d === 'undefined') {
+      (globalThis as any).d = {};
+    }
+    Object.defineProperty((globalThis as any).d, 'global', {
+      value: forceGlobalObject,
+      writable: true,
+      enumerable: true,
+      configurable: true
+    });
+    console.log('🔧 [FINAL CHECK] Approach 3 - Object.defineProperty:', typeof (globalThis as any).d?.global !== 'undefined');
+    
+    // Apply to window and self
+    if (typeof window !== 'undefined') {
+      (window as any).d = { global: forceGlobalObject };
+    }
+    if (typeof self !== 'undefined') {
+      (self as any).d = { global: forceGlobalObject };
+    }
+    
+    console.log('🔧 [FINAL CHECK] Final verification:');
+    console.log('🔧 [FINAL CHECK] - globalThis.d exists:', typeof (globalThis as any).d !== 'undefined');
+    console.log('🔧 [FINAL CHECK] - globalThis.d.global exists:', typeof (globalThis as any).d?.global !== 'undefined');
+    console.log('🔧 [FINAL CHECK] - globalThis.d.global.headers exists:', typeof (globalThis as any).d?.global?.headers !== 'undefined');
+    console.log('🔧 [FINAL CHECK] - globalThis.d.global value:', (globalThis as any).d?.global);
+    
+  } catch (error) {
+    console.error('🔧 [FINAL CHECK] Error creating d.global:', error);
   }
-  if (typeof self !== 'undefined') {
-    (self as any).d = { global: forceGlobalObject };
-  }
-  
-  console.log('🔧 [FINAL CHECK] d.global force created:', typeof (globalThis as any).d?.global !== 'undefined');
-  console.log('🔧 [FINAL CHECK] d.global.headers exists:', typeof (globalThis as any).d?.global?.headers !== 'undefined');
 }
 
 // Create Supabase client
