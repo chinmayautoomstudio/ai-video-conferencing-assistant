@@ -37,16 +37,17 @@ if (typeof process === 'undefined') {
 console.log('✅ Polyfills verified - global and process are available')
 
 try {
-  // Create client with proper configuration
+  // Create client with minimal configuration to avoid browser compatibility issues
   supabase = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
-      detectSessionInUrl: false
+      detectSessionInUrl: false,
+      flowType: 'implicit'
     },
-    realtime: {
-      params: {
-        eventsPerSecond: 10
+    global: {
+      headers: {
+        'X-Client-Info': 'supabase-js-web'
       }
     }
   })

@@ -10,6 +10,148 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Critical polyfills that must be available before any module loads
+      console.log('🔧 [HTML POLYFILLS] Loading critical polyfills...');
+      
+      // Global polyfill - most critical
+      if (typeof global === 'undefined') {
+        console.log('🔧 [HTML POLYFILLS] Adding global polyfill');
+        window.global = globalThis;
+        globalThis.global = globalThis;
+        if (typeof self !== 'undefined') {
+          self.global = globalThis;
+        }
+      }
+      
+      // Process polyfill - comprehensive
+      if (typeof process === 'undefined') {
+        console.log('🔧 [HTML POLYFILLS] Adding process polyfill');
+        const processPolyfill = {
+          env: {},
+          browser: true,
+          nextTick: function(fn) { return setTimeout(fn, 0); },
+          version: 'v16.0.0',
+          platform: 'browser',
+          cwd: function() { return '/'; },
+          chdir: function() {},
+          umask: function() { return 0; },
+          hrtime: function() { return [0, 0]; },
+          uptime: function() { return 0; },
+          kill: function() {},
+          exit: function() {},
+          on: function() {},
+          off: function() {},
+          emit: function() {},
+          addListener: function() {},
+          removeListener: function() {},
+          removeAllListeners: function() {},
+          setMaxListeners: function() {},
+          getMaxListeners: function() { return 0; },
+          listeners: function() { return []; },
+          rawListeners: function() { return []; },
+          listenerCount: function() { return 0; },
+          eventNames: function() { return []; },
+          prependListener: function() {},
+          prependOnceListener: function() {},
+          once: function() {},
+          hasOwnProperty: Object.prototype.hasOwnProperty,
+          isPrototypeOf: Object.prototype.isPrototypeOf,
+          propertyIsEnumerable: Object.prototype.propertyIsEnumerable,
+          toString: function() { return '[object process]'; },
+          valueOf: function() { return processPolyfill; }
+        };
+        
+        window.process = processPolyfill;
+        globalThis.process = processPolyfill;
+        if (typeof self !== 'undefined') {
+          self.process = processPolyfill;
+        }
+      }
+      
+      // Buffer polyfill
+      if (typeof Buffer === 'undefined') {
+        console.log('🔧 [HTML POLYFILLS] Adding Buffer polyfill');
+        const bufferPolyfill = {
+          isBuffer: function() { return false; },
+          from: function() { return new Uint8Array(); },
+          alloc: function() { return new Uint8Array(); },
+          allocUnsafe: function() { return new Uint8Array(); },
+          concat: function() { return new Uint8Array(); },
+          compare: function() { return 0; },
+          copy: function() { return 0; },
+          equals: function() { return false; },
+          fill: function() { return bufferPolyfill; },
+          indexOf: function() { return -1; },
+          lastIndexOf: function() { return -1; },
+          readDoubleBE: function() { return 0; },
+          readDoubleLE: function() { return 0; },
+          readFloatBE: function() { return 0; },
+          readFloatLE: function() { return 0; },
+          readInt8: function() { return 0; },
+          readInt16BE: function() { return 0; },
+          readInt16LE: function() { return 0; },
+          readInt32BE: function() { return 0; },
+          readInt32LE: function() { return 0; },
+          readIntBE: function() { return 0; },
+          readIntLE: function() { return 0; },
+          readUInt8: function() { return 0; },
+          readUInt16BE: function() { return 0; },
+          readUInt16LE: function() { return 0; },
+          readUInt32BE: function() { return 0; },
+          readUInt32LE: function() { return 0; },
+          readUIntBE: function() { return 0; },
+          readUIntLE: function() { return 0; },
+          subarray: function() { return new Uint8Array(); },
+          swap16: function() { return bufferPolyfill; },
+          swap32: function() { return bufferPolyfill; },
+          swap64: function() { return bufferPolyfill; },
+          toJSON: function() { return { type: 'Buffer', data: [] }; },
+          toString: function() { return ''; },
+          write: function() { return 0; },
+          writeDoubleBE: function() { return 0; },
+          writeDoubleLE: function() { return 0; },
+          writeFloatBE: function() { return 0; },
+          writeFloatLE: function() { return 0; },
+          writeInt8: function() { return 0; },
+          writeInt16BE: function() { return 0; },
+          writeInt16LE: function() { return 0; },
+          writeInt32BE: function() { return 0; },
+          writeInt32LE: function() { return 0; },
+          writeIntBE: function() { return 0; },
+          writeIntLE: function() { return 0; },
+          writeUInt8: function() { return 0; },
+          writeUInt16BE: function() { return 0; },
+          writeUInt16LE: function() { return 0; },
+          writeUInt32BE: function() { return 0; },
+          writeUInt32LE: function() { return 0; },
+          writeUIntBE: function() { return 0; },
+          writeUIntLE: function() { return 0; }
+        };
+        
+        window.Buffer = bufferPolyfill;
+        globalThis.Buffer = bufferPolyfill;
+        if (typeof self !== 'undefined') {
+          self.Buffer = bufferPolyfill;
+        }
+      }
+      
+      // Additional globals
+      if (typeof setImmediate === 'undefined') {
+        window.setImmediate = function(fn) { return setTimeout(fn, 0); };
+        globalThis.setImmediate = function(fn) { return setTimeout(fn, 0); };
+      }
+      
+      if (typeof clearImmediate === 'undefined') {
+        window.clearImmediate = clearTimeout;
+        globalThis.clearImmediate = clearTimeout;
+      }
+      
+      console.log('🔧 [HTML POLYFILLS] Critical polyfills loaded successfully');
+      console.log('🔧 [HTML POLYFILLS] Global available:', typeof global !== 'undefined');
+      console.log('🔧 [HTML POLYFILLS] Process available:', typeof process !== 'undefined');
+      console.log('🔧 [HTML POLYFILLS] Buffer available:', typeof Buffer !== 'undefined');
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
