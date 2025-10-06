@@ -3,11 +3,11 @@ console.log('🔧 [PRE-IMPORT] Creating d.global object...');
 
 // Create d.global object immediately
 if (typeof globalThis !== 'undefined') {
-  if (!globalThis.d) {
-    globalThis.d = {};
+  if (!(globalThis as any).d) {
+    (globalThis as any).d = {};
   }
-  if (!globalThis.d.global) {
-    globalThis.d.global = {
+  if (!(globalThis as any).d.global) {
+    (globalThis as any).d.global = {
       headers: {},
       process: {},
       Buffer: {},
@@ -19,11 +19,11 @@ if (typeof globalThis !== 'undefined') {
 }
 
 if (typeof window !== 'undefined') {
-  if (!window.d) {
-    window.d = {};
+  if (!(window as any).d) {
+    (window as any).d = {};
   }
-  if (!window.d.global) {
-    window.d.global = {
+  if (!(window as any).d.global) {
+    (window as any).d.global = {
       headers: {},
       process: {},
       Buffer: {},
@@ -34,7 +34,7 @@ if (typeof window !== 'undefined') {
   }
 }
 
-console.log('🔧 [PRE-IMPORT] d.global created:', typeof globalThis.d?.global !== 'undefined');
+console.log('🔧 [PRE-IMPORT] d.global created:', typeof (globalThis as any).d?.global !== 'undefined');
 
 import { createClient } from '@supabase/supabase-js';
 
